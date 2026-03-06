@@ -3,27 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Izin BK | Sistem Perizinan Digital</title>
+    <title>E-Izin BK | Sistem Perizinan Digital (Supabase)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide-react/0.263.1/lucide-react.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.3); }
+        .loading-dots:after { content: ' .'; animation: dots 1s steps(5, end) infinite; }
+        @keyframes dots { 0%, 20% { content: ' .'; } 40% { content: ' ..'; } 60% { content: ' ...'; } 80%, 100% { content: ''; } }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen">
+<body class="bg-[#f8fafc] min-h-screen text-slate-900">
 
-    <div id="app" class="max-w-md mx-auto md:max-w-4xl min-h-screen flex flex-col">
+    <div id="app" class="max-w-md mx-auto md:max-w-5xl min-h-screen flex flex-col">
         <!-- Header -->
-        <header class="p-6 flex justify-between items-center border-b bg-white sticky top-0 z-50">
-            <div class="flex items-center gap-2">
-                <div class="bg-blue-600 p-2 rounded-lg text-white">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield-check"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+        <header class="p-6 flex justify-between items-center glass sticky top-0 z-50 rounded-b-2xl shadow-sm">
+            <div class="flex items-center gap-3">
+                <div class="bg-gradient-to-br from-blue-600 to-indigo-700 p-2.5 rounded-xl text-white shadow-lg shadow-blue-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
                 </div>
-                <h1 class="text-xl font-bold text-slate-800">E-Izin BK</h1>
+                <div>
+                    <h1 class="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600 leading-tight">E-Izin BK</h1>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                        <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Database Live</p>
+                    </div>
+                </div>
             </div>
-            <button id="nav-btn" onclick="toggleView()" class="text-sm font-medium text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-full transition-all">
+            <button id="nav-btn" onclick="toggleView()" class="text-xs font-bold text-blue-600 bg-blue-50 border border-blue-100 px-5 py-2.5 rounded-full hover:bg-blue-600 hover:text-white transition-all duration-300">
                 Pindah ke Mode BK
             </button>
         </header>
@@ -32,300 +40,362 @@
         <main class="flex-grow p-4 md:p-8">
             
             <!-- Landing Page Selection -->
-            <div id="view-landing" class="flex flex-col items-center justify-center py-12 space-y-8">
-                <div class="text-center">
-                    <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Selamat Datang</h2>
-                    <p class="text-slate-500">Sistem Perizinan Keluar Kelas Berbasis Digital & AI</p>
+            <div id="view-landing" class="flex flex-col items-center justify-center py-16 space-y-10">
+                <div class="text-center space-y-3">
+                    <h2 class="text-4xl font-extrabold tracking-tight text-slate-900">Digitalisasi Perizinan</h2>
+                    <p class="text-slate-500 max-w-sm mx-auto leading-relaxed text-sm">Sistem pengajuan izin keluar kelas cerdas dengan analisis AI dan database terpusat.</p>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
-                    <button onclick="showSection('student')" class="group p-8 bg-white rounded-2xl shadow-sm border hover:border-blue-500 hover:shadow-md transition-all text-left">
-                        <div class="bg-blue-100 text-blue-600 w-12 h-12 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-3xl">
+                    <button onclick="showSection('student')" class="group relative overflow-hidden p-10 bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 hover:border-blue-500 transition-all duration-500 text-left">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                         </div>
-                        <h3 class="text-xl font-bold text-slate-800">Siswa</h3>
-                        <p class="text-slate-500 text-sm mt-2">Ajukan izin keluar kelas dengan cepat tanpa perlu ke ruang BK.</p>
+                        <div class="bg-blue-600 text-white w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-blue-200 group-hover:rotate-6 transition-transform">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-2">Akses Siswa</h3>
+                        <p class="text-slate-500 text-sm">Ajukan izin tanpa perlu meninggalkan kelas. Cepat, mudah, dan transparan.</p>
                     </button>
-                    <button onclick="showSection('bk-login')" class="group p-8 bg-white rounded-2xl shadow-sm border hover:border-indigo-500 hover:shadow-md transition-all text-left">
-                        <div class="bg-indigo-100 text-indigo-600 w-12 h-12 rounded-xl flex items-center justify-center mb-4 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+                    
+                    <button onclick="showSection('bk-login')" class="group relative overflow-hidden p-10 bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 hover:border-indigo-500 transition-all duration-500 text-left">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
                         </div>
-                        <h3 class="text-xl font-bold text-slate-800">Guru BK</h3>
-                        <p class="text-slate-500 text-sm mt-2">Pantau, verifikasi, dan kelola izin siswa secara real-time.</p>
+                        <div class="bg-indigo-600 text-white w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-indigo-200 group-hover:-rotate-6 transition-transform">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-2">Akses Guru BK</h3>
+                        <p class="text-slate-500 text-sm">Kelola perizinan dengan dukungan analisis AI secara terpusat.</p>
                     </button>
                 </div>
             </div>
 
             <!-- Form Siswa -->
-            <div id="view-student" class="hidden max-w-lg mx-auto bg-white p-8 rounded-2xl shadow-sm border">
-                <h2 class="text-2xl font-bold text-slate-800 mb-6">Form Izin Keluar</h2>
-                <form id="izinForm" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Nama Lengkap</label>
-                        <input type="text" id="nama" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Kelas</label>
-                            <input type="text" id="kelas" placeholder="Contoh: XII-IPA 1" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+            <div id="view-student" class="hidden max-w-xl mx-auto space-y-6">
+                <div class="bg-white p-10 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-8 flex items-center gap-2">
+                        <span class="w-1.5 h-6 bg-blue-600 rounded-full"></span>
+                        Form Pengajuan Izin
+                    </h2>
+                    <form id="izinForm" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Nama Lengkap</label>
+                            <input type="text" id="nama" required class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all placeholder:text-slate-300" placeholder="Masukkan nama sesuai absen">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Guru Mapel</label>
-                            <input type="text" id="guru" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Jam Pelajaran Ke-</label>
-                            <input type="number" id="jam" min="1" max="12" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Kelas</label>
+                            <input type="text" id="kelas" placeholder="XII-IPA 1" required class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Durasi (Menit)</label>
-                            <input type="number" id="durasi" placeholder="Contoh: 15" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Guru Mapel</label>
+                            <input type="text" id="guru" placeholder="Nama Guru di Kelas" required class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all">
                         </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Alasan Izin</label>
-                        <textarea id="alasan" rows="3" placeholder="Jelaskan alasan Anda dengan detail..." required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
-                    </div>
-                    <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200">Kirim Pengajuan Izin</button>
-                </form>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Jam Pelajaran</label>
+                            <input type="number" id="jam" min="1" max="12" placeholder="Ke-..." required class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Durasi (Menit)</label>
+                            <input type="number" id="durasi" placeholder="Misal: 15" required class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Alasan Izin Keluar</label>
+                            <textarea id="alasan" rows="3" placeholder="Jelaskan alasan Anda..." required class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all"></textarea>
+                        </div>
+                        <button type="submit" id="submitBtn" class="md:col-span-2 w-full bg-blue-600 text-white font-bold py-4 rounded-2xl hover:bg-blue-700 active:scale-95 transition-all shadow-xl shadow-blue-200 flex items-center justify-center gap-2">
+                            Kirim Izin Sekarang
+                        </button>
+                    </form>
+                </div>
 
                 <!-- Status Panel -->
-                <div id="statusPanel" class="mt-8 hidden border-t pt-6">
-                    <h3 class="font-semibold text-slate-800 mb-4">Status Pengajuan Terakhir</h3>
-                    <div id="statusCard" class="bg-amber-50 border border-amber-200 p-4 rounded-xl flex items-center justify-between">
-                        <div>
-                            <p id="statusNama" class="font-bold text-slate-800"></p>
-                            <p id="statusText" class="text-sm text-amber-700">Menunggu Persetujuan BK...</p>
+                <div id="statusPanel" class="hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div id="statusCard" class="p-8 rounded-3xl border-2 flex items-center justify-between transition-all">
+                        <div class="flex items-center gap-5">
+                            <div id="statusIconBg" class="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg">
+                                <div id="statusIcon"></div>
+                            </div>
+                            <div>
+                                <h4 id="statusNama" class="text-xl font-bold text-slate-800"></h4>
+                                <p id="statusText" class="text-sm font-medium opacity-80"></p>
+                            </div>
                         </div>
-                        <div id="statusIcon" class="animate-pulse">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        </div>
+                        <div id="statusBadge" class="px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest"></div>
                     </div>
                 </div>
             </div>
 
             <!-- Login BK -->
-            <div id="view-bk-login" class="hidden max-w-sm mx-auto bg-white p-8 rounded-2xl shadow-sm border mt-10 text-center">
-                <div class="bg-indigo-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-600"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                </div>
-                <h2 class="text-2xl font-bold text-slate-800 mb-6">Akses Guru BK</h2>
-                <div class="space-y-4">
-                    <input type="text" id="bkUser" placeholder="Username" class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
-                    <input type="password" id="bkPass" placeholder="Password" class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
-                    <button onclick="loginBK()" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 transition-colors">Masuk Dashboard</button>
-                    <p class="text-xs text-slate-400">GuruBK | BKsmada_</p>
+            <div id="view-bk-login" class="hidden max-w-md mx-auto py-12">
+                <div class="bg-white p-10 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 text-center">
+                    <div class="bg-indigo-100 w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-8 text-indigo-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    </div>
+                    <h2 class="text-2xl font-extrabold text-slate-800 mb-2">Akses Terbatas</h2>
+                    <p class="text-slate-400 text-sm mb-8">Silakan masuk menggunakan akun Guru BK</p>
+                    <div class="space-y-4">
+                        <input type="text" id="bkUser" placeholder="Username" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
+                        <input type="password" id="bkPass" placeholder="Password" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500">
+                        <button onclick="loginBK()" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-200">Masuk Dashboard</button>
+                    </div>
                 </div>
             </div>
 
             <!-- Dashboard BK -->
-            <div id="view-bk-dashboard" class="hidden space-y-6">
-                <div class="flex justify-between items-end">
+            <div id="view-bk-dashboard" class="hidden space-y-8 animate-in fade-in duration-700">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h2 class="text-2xl font-bold text-slate-800">Dashboard Pengawasan</h2>
-                        <p class="text-slate-500 text-sm">Kelola perizinan siswa secara real-time</p>
+                        <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Pusat Kendali BK</h2>
+                        <p class="text-slate-500 text-sm">Monitoring perizinan siswa secara real-time melalui Supabase.</p>
                     </div>
-                    <button onclick="logoutBK()" class="text-red-500 text-sm font-medium hover:bg-red-50 px-3 py-1 rounded-md">Logout</button>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                    <div class="bg-white p-4 rounded-xl border border-slate-200">
-                        <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Total Hari Ini</p>
-                        <h4 id="stat-total" class="text-2xl font-bold text-slate-800">0</h4>
-                    </div>
-                    <div class="bg-white p-4 rounded-xl border border-slate-200">
-                        <p class="text-amber-500 text-xs font-semibold uppercase tracking-wider">Pending</p>
-                        <h4 id="stat-pending" class="text-2xl font-bold text-slate-800">0</h4>
-                    </div>
-                    <div class="bg-white p-4 rounded-xl border border-slate-200">
-                        <p class="text-blue-500 text-xs font-semibold uppercase tracking-wider">Review AI</p>
-                        <h4 id="stat-ai" class="text-2xl font-bold text-slate-800">0</h4>
+                    <div class="flex gap-3">
+                        <button onclick="logoutBK()" class="bg-white text-red-500 border border-red-100 px-5 py-2.5 rounded-2xl font-bold text-xs hover:bg-red-500 hover:text-white transition-all shadow-sm">Keluar</button>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="bg-blue-100 text-blue-600 p-3 rounded-2xl"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><circle cx="19" cy="11" r="2"/></svg></div>
+                            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest leading-none">Total Izin</p>
+                        </div>
+                        <h4 id="stat-total" class="text-3xl font-black text-slate-900">0</h4>
+                    </div>
+                    <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="bg-amber-100 text-amber-600 p-3 rounded-2xl"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+                            <p class="text-amber-500 text-xs font-bold uppercase tracking-widest leading-none">Menunggu</p>
+                        </div>
+                        <h4 id="stat-pending" class="text-3xl font-black text-slate-900">0</h4>
+                    </div>
+                    <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm border-l-4 border-l-red-500">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="bg-red-100 text-red-600 p-3 rounded-2xl"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.93 4.93l2.83 2.83"/><path d="M16.24 16.24l2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.93 19.07l2.83-2.83"/><path d="M16.24 7.76l2.83-2.83"/></svg></div>
+                            <p class="text-red-500 text-xs font-bold uppercase tracking-widest leading-none">AI Flagged</p>
+                        </div>
+                        <h4 id="stat-ai" class="text-3xl font-black text-slate-900">0</h4>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/50 overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left">
-                            <thead class="bg-slate-50 border-b">
-                                <tr>
-                                    <th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Siswa & Kelas</th>
-                                    <th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Alasan & Durasi</th>
-                                    <th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Analisis AI</th>
-                                    <th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Aksi</th>
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-100">
+                                    <th class="px-8 py-5 text-xs font-bold text-slate-400 uppercase tracking-widest">Siswa & Kelas</th>
+                                    <th class="px-8 py-5 text-xs font-bold text-slate-400 uppercase tracking-widest">Detail Izin</th>
+                                    <th class="px-8 py-5 text-xs font-bold text-slate-400 uppercase tracking-widest">Analisis AI</th>
+                                    <th class="px-8 py-5 text-xs font-bold text-slate-400 uppercase tracking-widest text-right">Keputusan</th>
                                 </tr>
                             </thead>
-                            <tbody id="izinList" class="divide-y">
-                                <!-- Data izin akan muncul di sini -->
+                            <tbody id="izinList" class="divide-y divide-slate-50">
+                                <!-- Data izin akan di-render di sini -->
                             </tbody>
                         </table>
                     </div>
-                    <div id="empty-state" class="p-12 text-center hidden">
-                        <p class="text-slate-400 italic">Belum ada pengajuan izin saat ini.</p>
+                    <div id="empty-state" class="p-20 text-center space-y-3 hidden">
+                        <div class="bg-slate-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        </div>
+                        <p class="text-slate-500 font-bold">Tidak Ada Antrean</p>
+                        <p class="text-slate-400 text-xs">Semua perizinan telah diproses oleh sistem.</p>
                     </div>
                 </div>
             </div>
 
         </main>
 
-        <footer class="p-6 text-center text-slate-400 text-xs border-t bg-white">
-            &copy; 2024 E-Izin BK SMA Negeri. Powered by AI Rule-Based System.
+        <footer class="p-8 text-center bg-white border-t border-slate-100">
+            <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em]">Sistem E-Izin BK &copy; 2025 • SMK/SMA Negeri Terpadu • Powered by Supabase AI</p>
         </footer>
     </div>
 
     <!-- Notification Toast -->
-    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-full shadow-2xl transition-all opacity-0 translate-y-10 pointer-events-none z-[100]">
-        Pesan di sini
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-8 py-4 rounded-3xl shadow-2xl transition-all duration-500 opacity-0 translate-y-10 pointer-events-none z-[100] flex items-center gap-3 border border-slate-700">
+        <span id="toast-icon"></span>
+        <p id="toast-msg" class="text-sm font-semibold"></p>
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, updateDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        // --- KONFIGURASI SUPABASE ---
+        const SUPABASE_URL = "https://ksrlnupdpdrjuhwctjxc.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtzcmxudXBkcGRyanVod2N0anhjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjczNDA4NiwiZXhwIjoyMDg4MzEwMDg2fQ.iX9WFd4uBLYm-Dss5m2lFwD0znil-p3GxGm6cj7ywtw"; // SERVICE ROLE KEY
+        
+        const supabase = netlify.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Global Config & Firebase
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'bk-izin-v1';
-
-        let currentUser = null;
+        // State Management
         let activeView = 'landing';
-        let allIzin = [];
+        let allIzinData = [];
+        let activeStudentName = '';
 
-        // Auth Init
-        const initAuth = async () => {
-            try {
-                await signInAnonymously(auth);
-            } catch (err) {
-                console.error("Auth error:", err);
-            }
-        };
-
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            if (user) listenToIzin();
-        });
-
-        // ---------------- AI Logic (Rule Based) ----------------
-        const analyzeIzin = (izin, history) => {
-            const results = [];
+        // --- AI ENGINE (Rule Based) ---
+        const runAIAnalysis = (izin, history) => {
+            const flags = [];
             
-            // 1. Alasan terlalu singkat
-            if (izin.alasan.trim().length < 10) {
-                results.push({ type: 'warning', msg: 'Alasan Tidak Jelas' });
+            // 1. Analisis Alasan (Singkat)
+            if (izin.alasan.trim().split(' ').length < 3) {
+                flags.push({ level: 'warning', msg: 'Alasan Tidak Jelas' });
             }
 
-            // 2. Durasi terlalu lama
+            // 2. Analisis Durasi (Lama)
             if (parseInt(izin.durasi) > 20) {
-                results.push({ type: 'danger', msg: 'Durasi Terlalu Lama' });
+                flags.push({ level: 'danger', msg: 'Durasi Terlalu Lama (>20m)' });
             }
 
-            // 3. Frekuensi (cek 3 izin dalam seminggu/data yang ada)
-            const countThisWeek = history.filter(h => h.nama === izin.nama).length;
-            if (countThisWeek >= 3) {
-                results.push({ type: 'critical', msg: 'Perlu Review BK (Izin Berulang)' });
+            // 3. Analisis Frekuensi (History)
+            const countWeekly = history.filter(h => h.nama.toLowerCase() === izin.nama.toLowerCase()).length;
+            if (countWeekly >= 3) {
+                flags.push({ level: 'critical', msg: 'Perlu Review BK (Izin Berulang)' });
             }
 
-            return results;
+            return flags;
         };
 
-        // ---------------- UI Functions ----------------
+        // --- CORE UI FUNCTIONS ---
         window.showSection = (sectionId) => {
-            const sections = ['view-landing', 'view-student', 'view-bk-login', 'view-bk-dashboard'];
-            sections.forEach(s => document.getElementById(s).classList.add('hidden'));
+            const sections = ['landing', 'student', 'bk-login', 'bk-dashboard'];
+            sections.forEach(s => document.getElementById('view-' + s).classList.add('hidden'));
             document.getElementById('view-' + sectionId).classList.remove('hidden');
             
             const navBtn = document.getElementById('nav-btn');
-            if (sectionId === 'student') navBtn.innerText = "Mode BK";
-            else if (sectionId === 'bk-dashboard') navBtn.innerText = "Logout BK";
-            else navBtn.innerText = "Halaman Utama";
+            if (sectionId === 'student') navBtn.innerText = "Halaman Utama";
+            else if (sectionId === 'bk-dashboard') navBtn.innerText = "Keluar Dashboard";
+            else navBtn.innerText = "Mode BK";
             
             activeView = sectionId;
+            if(sectionId === 'bk-dashboard') fetchData();
         };
 
         window.toggleView = () => {
-            if (activeView === 'student' || activeView === 'bk-login') showSection('landing');
+            if (activeView === 'landing') showSection('bk-login');
             else if (activeView === 'bk-dashboard') logoutBK();
-            else showSection('bk-login');
+            else showSection('landing');
         };
 
-        const showToast = (msg) => {
+        const showToast = (msg, type = 'info') => {
             const toast = document.getElementById('toast');
-            toast.innerText = msg;
+            const toastMsg = document.getElementById('toast-msg');
+            toastMsg.innerText = msg;
             toast.classList.remove('opacity-0', 'translate-y-10');
             setTimeout(() => toast.classList.add('opacity-0', 'translate-y-10'), 3000);
         };
 
-        // ---------------- Siswa Side ----------------
+        // --- SUPABASE DATA HANDLERS ---
+        const fetchData = async () => {
+            const { data, error } = await supabase
+                .from('izin_pengajuan')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error("Fetch Error:", error);
+                return;
+            }
+
+            allIzinData = data;
+            renderDashboard();
+            if (activeStudentName) updateStudentStatusUI();
+        };
+
+        // Listen for Realtime Changes
+        supabase
+            .channel('schema-db-changes')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'izin_pengajuan' }, () => {
+                fetchData();
+            })
+            .subscribe();
+
+        // --- STUDENT LOGIC ---
         document.getElementById('izinForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!currentUser) return;
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading-dots text-white">Sedang Mengirim</span>';
 
-            const data = {
+            const payload = {
                 nama: document.getElementById('nama').value,
                 kelas: document.getElementById('kelas').value,
                 guru: document.getElementById('guru').value,
-                jam: document.getElementById('jam').value,
-                durasi: document.getElementById('durasi').value,
+                jam: parseInt(document.getElementById('jam').value),
+                durasi: parseInt(document.getElementById('durasi').value),
                 alasan: document.getElementById('alasan').value,
-                status: 'pending',
-                timestamp: Date.now()
+                status: 'pending'
             };
 
-            try {
-                const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'izin_pengajuan');
-                await addDoc(colRef, data);
-                
-                showToast("Berhasil mengirim pengajuan!");
+            const { error } = await supabase.from('izin_pengajuan').insert([payload]);
+
+            if (error) {
+                showToast("Gagal mengirim izin. Cek koneksi.");
+            } else {
+                showToast("Izin berhasil dikirim!");
+                activeStudentName = payload.nama;
                 document.getElementById('statusPanel').classList.remove('hidden');
-                document.getElementById('statusNama').innerText = data.nama;
-                document.getElementById('izinForm').reset();
-            } catch (err) {
-                showToast("Gagal mengirim data.");
+                document.getElementById('statusNama').innerText = payload.nama;
+                fetchData(); // Trigger update
             }
+
+            btn.disabled = false;
+            btn.innerHTML = 'Kirim Izin Sekarang';
         });
 
-        // ---------------- BK Side ----------------
+        const updateStudentStatusUI = () => {
+            const latest = allIzinData.find(i => i.nama.toLowerCase() === activeStudentName.toLowerCase());
+            if (!latest) return;
+
+            const card = document.getElementById('statusCard');
+            const text = document.getElementById('statusText');
+            const icon = document.getElementById('statusIcon');
+            const bg = document.getElementById('statusIconBg');
+            const badge = document.getElementById('statusBadge');
+
+            if (latest.status === 'pending') {
+                card.className = "p-8 rounded-3xl border-2 border-amber-100 bg-amber-50/50 flex items-center justify-between";
+                text.innerText = "Sedang ditinjau oleh Guru BK...";
+                bg.className = "w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-amber-500 text-white animate-pulse";
+                icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
+                badge.innerText = "Pending";
+                badge.className = "px-4 py-1.5 rounded-full text-[10px] font-bold bg-amber-200 text-amber-700 uppercase tracking-widest";
+            } else if (latest.status === 'acc') {
+                card.className = "p-8 rounded-3xl border-2 border-green-100 bg-green-50/50 flex items-center justify-between";
+                text.innerText = "Izin Disetujui! Silakan keluar kelas.";
+                bg.className = "w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-green-500 text-white";
+                icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+                badge.innerText = "Disetujui";
+                badge.className = "px-4 py-1.5 rounded-full text-[10px] font-bold bg-green-200 text-green-700 uppercase tracking-widest";
+            } else {
+                card.className = "p-8 rounded-3xl border-2 border-red-100 bg-red-50/50 flex items-center justify-between";
+                text.innerText = "Izin Ditolak. Harap tetap berada di kelas.";
+                bg.className = "w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-red-500 text-white";
+                icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`;
+                badge.innerText = "Ditolak";
+                badge.className = "px-4 py-1.5 rounded-full text-[10px] font-bold bg-red-200 text-red-700 uppercase tracking-widest";
+            }
+        };
+
+        // --- BK LOGIC ---
         window.loginBK = () => {
             const user = document.getElementById('bkUser').value;
             const pass = document.getElementById('bkPass').value;
             if (user === 'GuruBK' && pass === 'BKsmada_') {
                 showSection('bk-dashboard');
-                showToast("Selamat Datang, Guru BK");
+                showToast("Autentikasi Berhasil");
             } else {
-                showToast("Username atau Password Salah!");
+                showToast("Username atau Password Salah", "error");
             }
         };
 
         window.logoutBK = () => {
             showSection('landing');
-            showToast("Berhasil Logout");
         };
 
-        window.updateStatus = async (id, status) => {
-            try {
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'izin_pengajuan', id);
-                await updateDoc(docRef, { status: status });
-                showToast(`Izin Berhasil di-${status.toUpperCase()}`);
-            } catch (err) {
-                showToast("Gagal update status.");
-            }
-        };
+        window.updateIzinStatus = async (id, status) => {
+            const { error } = await supabase
+                .from('izin_pengajuan')
+                .update({ status: status })
+                .eq('id', id);
 
-        // ---------------- Real-time Listeners ----------------
-        const listenToIzin = () => {
-            const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'izin_pengajuan');
-            const q = query(colRef, orderBy('timestamp', 'desc'));
-
-            onSnapshot(q, (snapshot) => {
-                const data = [];
-                snapshot.forEach(doc => data.push({ id: doc.id, ...doc.data() }));
-                allIzin = data;
-                renderDashboard();
-                updateStudentStatus();
-            }, (err) => console.error("Listen error:", err));
+            if (error) showToast("Gagal memperbarui status");
+            else showToast(`Izin Berhasil di-${status.toUpperCase()}`);
         };
 
         const renderDashboard = () => {
@@ -335,54 +405,62 @@
             
             const stats = { total: 0, pending: 0, ai: 0 };
 
-            if (allIzin.length === 0) {
+            if (allIzinData.length === 0) {
                 empty.classList.remove('hidden');
                 return;
             }
             empty.classList.add('hidden');
 
-            allIzin.forEach(izin => {
+            allIzinData.forEach(izin => {
                 stats.total++;
                 if (izin.status === 'pending') stats.pending++;
 
-                // AI Analysis
-                const aiFindings = analyzeIzin(izin, allIzin.filter(x => x.id !== izin.id));
+                // AI Engine Check
+                const aiFindings = runAIAnalysis(izin, allIzinData.filter(x => x.id !== izin.id));
                 if (aiFindings.length > 0) stats.ai++;
 
                 const row = document.createElement('tr');
-                row.className = "hover:bg-slate-50 transition-colors";
+                row.className = "hover:bg-slate-50 transition-all duration-300 group";
                 
-                let statusBadge = '';
-                if (izin.status === 'acc') statusBadge = '<span class="px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded">DISETUJUI</span>';
-                else if (izin.status === 'tolak') statusBadge = '<span class="px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded">DITOLAK</span>';
-                else statusBadge = '<span class="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded">MENUNGGU</span>';
+                let badgeClass = "bg-amber-100 text-amber-700";
+                if (izin.status === 'acc') badgeClass = "bg-green-100 text-green-700";
+                if (izin.status === 'tolak') badgeClass = "bg-red-100 text-red-700";
 
-                let aiHtml = aiFindings.map(f => {
-                    const color = f.type === 'critical' ? 'text-red-600 bg-red-50' : (f.type === 'danger' ? 'text-orange-600 bg-orange-50' : 'text-amber-600 bg-amber-50');
-                    return `<div class="text-[10px] font-medium px-2 py-0.5 rounded border border-current mt-1 ${color}">${f.msg}</div>`;
-                }).join('') || '<span class="text-xs text-green-500 font-medium">✓ Aman</span>';
+                const aiHtml = aiFindings.map(f => {
+                    const color = f.level === 'critical' ? 'text-red-600 bg-red-50' : 'text-amber-600 bg-amber-50';
+                    return `<div class="text-[9px] font-bold px-2 py-1 rounded-md mb-1 border border-current w-fit ${color}">${f.msg}</div>`;
+                }).join('') || '<span class="text-[10px] text-green-500 font-bold uppercase tracking-widest flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Verified</span>';
 
                 row.innerHTML = `
-                    <td class="px-6 py-4">
-                        <div class="font-bold text-slate-800">${izin.nama}</div>
-                        <div class="text-xs text-slate-500">Kelas: ${izin.kelas}</div>
+                    <td class="px-8 py-6">
+                        <div class="font-bold text-slate-800 group-hover:text-blue-600 transition-colors">${izin.nama}</div>
+                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">${izin.kelas}</div>
                     </td>
-                    <td class="px-6 py-4">
-                        <div class="text-sm text-slate-600 italic">"${izin.alasan}"</div>
-                        <div class="text-xs font-semibold text-slate-400 mt-1">${izin.durasi} Menit • Jam ke-${izin.jam}</div>
+                    <td class="px-8 py-6">
+                        <div class="text-sm text-slate-600 font-medium mb-1">"${izin.alasan}"</div>
+                        <div class="flex items-center gap-3 text-[10px] text-slate-400 font-bold">
+                            <span class="bg-slate-100 px-2 py-0.5 rounded">Jam Ke-${izin.jam}</span>
+                            <span class="bg-slate-100 px-2 py-0.5 rounded">${izin.durasi} Menit</span>
+                        </div>
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="px-8 py-6">
                         ${aiHtml}
                     </td>
-                    <td class="px-6 py-4 text-right space-x-2">
+                    <td class="px-8 py-6 text-right">
                         ${izin.status === 'pending' ? `
-                            <button onclick="updateStatus('${izin.id}', 'acc')" class="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition-shadow shadow-sm" title="Terima">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                            </button>
-                            <button onclick="updateStatus('${izin.id}', 'tolak')" class="bg-red-50 text-red-600 p-2 rounded-lg hover:bg-red-100 transition-shadow" title="Tolak">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                            </button>
-                        ` : statusBadge}
+                            <div class="flex justify-end gap-2">
+                                <button onclick="updateIzinStatus(${izin.id}, 'acc')" class="bg-blue-600 text-white p-2.5 rounded-xl hover:bg-blue-700 hover:rotate-6 transition-all shadow-md">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                                </button>
+                                <button onclick="updateIzinStatus(${izin.id}, 'tolak')" class="bg-slate-100 text-slate-400 p-2.5 rounded-xl hover:bg-red-50 hover:text-red-500 transition-all">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                                </button>
+                            </div>
+                        ` : `
+                            <span class="px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest ${badgeClass}">
+                                ${izin.status === 'acc' ? 'Diterima' : 'Ditolak'}
+                            </span>
+                        `}
                     </td>
                 `;
                 list.appendChild(row);
@@ -393,33 +471,8 @@
             document.getElementById('stat-ai').innerText = stats.ai;
         };
 
-        const updateStudentStatus = () => {
-            const nama = document.getElementById('nama').value || document.getElementById('statusNama').innerText;
-            if (!nama) return;
-
-            const myIzin = allIzin.find(i => i.nama === nama);
-            if (myIzin) {
-                const card = document.getElementById('statusCard');
-                const text = document.getElementById('statusText');
-                const icon = document.getElementById('statusIcon');
-                
-                if (myIzin.status === 'acc') {
-                    card.className = "bg-green-50 border border-green-200 p-4 rounded-xl flex items-center justify-between";
-                    text.innerText = "Izin Disetujui - Silakan keluar kelas.";
-                    text.className = "text-sm text-green-700 font-bold";
-                    icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
-                    icon.classList.remove('animate-pulse');
-                } else if (myIzin.status === 'tolak') {
-                    card.className = "bg-red-50 border border-red-200 p-4 rounded-xl flex items-center justify-between";
-                    text.innerText = "Izin Ditolak - Harap tetap di kelas.";
-                    text.className = "text-sm text-red-700 font-bold";
-                    icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-600"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`;
-                    icon.classList.remove('animate-pulse');
-                }
-            }
-        };
-
-        initAuth();
+        // Initial Fetch
+        fetchData();
     </script>
 </body>
 </html>
